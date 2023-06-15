@@ -35,8 +35,12 @@ function searchBinDir($phpName) {
 }
 
 function getAllPhpExecFromDir($directory, $phpName) {
-    if($phpBinaries = glob($directory . DIRECTORY_SEPARATOR . $phpName)) {
+    $phpGlob = $directory . DIRECTORY_SEPARATOR . $phpName;
+    if ($phpBinaries = glob($phpGlob)) {
         return isPhpBinaries($phpBinaries);
+    }
+    if ($phpBinary = isPhpBinaries([$phpGlob])) {
+        return $phpBinary;
     }
     return null;
 }
