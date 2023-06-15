@@ -39,8 +39,20 @@ function getAllPhpExecFromDir($directory, $phpName) {
     if ($phpBinaries = glob($phpGlob)) {
         return isPhpBinaries($phpBinaries);
     }
-    if ($phpBinary = isPhpBinaries([$phpGlob])) {
-        return $phpBinary;
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        return null;   
+    }
+    return getAllPhpExecFromDirLinux($$directory, $phpName);
+}
+
+function getAllPhpExecFromDirLinux($directory, $phpName) {
+    $command = "ls -p \"$directory\" | grep -E \"$phpName\"";
+    exec($command, $output);
+    foreach ($output as $file) {
+        $filePath = $directory . DIRECTORY_SEPARATOR . $file;
+        if (isPhpBinary($filePath)) {
+            return $filePath;
+        }
     }
     return null;
 }
@@ -55,8 +67,8 @@ function isPhpBinaries($phpBinaries) {
 }
 
 function isPhpBinary($binaryPath) {
-    if (!isFileExecutable($binaryPath))
-        return false;
+    // if (!isFileExecutable($binaryPath))
+    //    return false;
     // Exécuter la commande "$binaryPath --version" et vérifier si la sortie contient "PHP"
     $command = $binaryPath . ' --version';
     $output = shell_exec($command);
