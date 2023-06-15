@@ -40,13 +40,25 @@ function getAllPhpExecFromDir($directory, $phpName) {
         return isPhpBinaries($phpBinaries);
     }
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        return null;   
+        return getAllPhpExecFromDirWindows($directory, $phpName);   
     }
-    return getAllPhpExecFromDirLinux($$directory, $phpName);
+    return getAllPhpExecFromDirLinux($directory, $phpName);
 }
 
 function getAllPhpExecFromDirLinux($directory, $phpName) {
     $command = "ls -p \"$directory\" | grep -E \"$phpName\"";
+    exec($command, $output);
+    foreach ($output as $file) {
+        $filePath = $directory . DIRECTORY_SEPARATOR . $file;
+        if (isPhpBinary($filePath)) {
+            return $filePath;
+        }
+    }
+    return null;
+}
+
+function getAllPhpExecFromDirWindows($directory, $phpName) {
+    $command = "dir /B \"$directory\" | findstr /R \"$phpName\"";
     exec($command, $output);
     foreach ($output as $file) {
         $filePath = $directory . DIRECTORY_SEPARATOR . $file;
